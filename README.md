@@ -354,3 +354,76 @@ trigger HelloWorldTrigger on Account (before insert) {
 | :---: | :--- | :--- |
 |1|Before triggers|used to update or validate record values before they’re saved to the database
 |2|After triggers|
+
+
+
+
+
+## Apex Integration Services
+- Apex callout enables you to with an external service using Apex Code
+- callout sends an HTTP request from Apex code and received the response
+- 2 types of callout
+  - SOAP Services (XML based request/response, require WSDL for code generation)
+  - Http Service(JSON Based request/response using http methos [], require Swaggers for code generation)
+ - Note
+   - Every request needs to be authorized when you call external services using the Apex Callouts
+- Steps
+  - From Setup, enter Remote Site Settings in the Quick Find box, then click Remote Site Settings.
+  - Click New Remote Site
+  - For the remote site name, enter 'xxx'.
+  - For the remote site URL, enter https://xyz.com.
+  - Click Save
+
+### Rest Callouts
+- 
+- Http Methods
+
+| # | Http Method | Notes | DB Operation|
+| :---: | :--- | :--- |:---|
+|1|Get|Retrieve data identified by a URL| Select 
+|2|Post|Create a resource or post data to the server|Create
+|3|Delete|Delete a resource identified by a URL|Delete
+|4|Put|Create or replace the resource sent in the request body|Update
+
+- Code for Get Call
+```
+Http http = new Http();
+HttpRequest request = new HttpRequest();
+request.setEndpoint('https://th-apex-http-callout.herokuapp.com/animals');
+request.setMethod('GET');
+HttpResponse response = http.send(request);
+// If the request is successful, parse the JSON response.
+if(response.getStatusCode() == 200) {
+  // Deserializes the JSON string into collections of primitive data types.
+  Map<String, Object> results = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+  // Cast the values in the 'animals' key as a list
+  List<Object> animals = (List<Object>) results.get('animals');
+  System.debug('Received the following animals:');
+  for(Object animal: animals) {
+    System.debug(animal);
+  }
+}
+```
+
+- Code for Post Call
+
+```
+Http http = new Http();
+HttpRequest request = new HttpRequest();
+request.setEndpoint('https://th-apex-http-callout.herokuapp.com/animals');
+request.setMethod('POST');
+request.setHeader('Content-Type', 'application/json;charset=UTF-8');
+request.setBody('{"name":"mighty moose"}');
+HttpResponse response = http.send(request);
+// Parse the JSON response
+if(response.getStatusCode() != 201) {
+   System.debug('The status code returned was not expected: ' +
+   response.getStatusCode() + ' ' + response.getStatus());
+} else {
+   System.debug(response.getBody());
+}
+```
+
+ 
+
+  
